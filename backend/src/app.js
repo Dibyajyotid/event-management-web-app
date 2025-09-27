@@ -6,12 +6,12 @@ import { config } from "dotenv";
 import authRoutes from "./routes/auth.route.js";
 import eventRoutes from "./routes/event.routes.js";
 import bookingRoutes from "./routes/booking.routes.js";
-import userRoutes from "./routes/users";
-import adminRoutes from "./routes/admin";
+import userRoutes from "./routes/user.routes.js";
+import adminRoutes from "./routes/admin.route.js";
 import notificationRoutes from "./routes/notifications";
-import recommendationRoutes from "./routes/recommendations";
-import socialRoutes from "./routes/social";
-import searchRoutes from "./routes/search";
+import recommendationRoutes from "./routes/recommendation.route.js";
+// import socialRoutes from "./routes/social.route.js";
+import searchRoutes from "./routes/search.routes.js";
 
 // Middleware
 import errorHandler from "./middleware/errorHandler.middleware.js";
@@ -38,7 +38,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/recommendations", recommendationRoutes);
-app.use("/api/social", socialRoutes);
+// app.use("/api/social", socialRoutes);
 app.use("/api/search", searchRoutes);
 
 // Health check

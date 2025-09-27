@@ -1,11 +1,12 @@
 import Booking from "../models/booking.model.js";
 import Event from "../models/event.model.js";
+import { createNotification } from "../services/notification.service.js";
 import {
   processPayment,
   handlePaymentSuccess,
   handlePaymentFailure,
   stripeClient,
-} from "../services/payment.js";
+} from "../services/payment.service.js";
 
 // Create new booking
 export async function createBooking(req, res) {
@@ -61,6 +62,22 @@ export async function createBooking(req, res) {
       if (!event.attendees.includes(req.user.userId))
         event.attendees.push(req.user.userId);
       await event.save();
+
+      //send booking confirmation notification
+      await createNotification({
+        userId: req.user.userId,
+        type: "booking",
+        message: `Your booking for ${event.title} is confirmed.`,
+        metadata: { bookingId: booking._id, eventId: event._id },
+      });
+    } else {
+      //send payment pending notification
+      await createNotification({
+        userId: req.user.userId,
+        type: "booking",
+        message: `Your booking payment for ${event.title} is pending.`,
+        metadata: { bookingId: booking._id, eventId: event._id },
+      });
     }
 
     const populatedBooking = await Booking.findById(booking._id)
@@ -173,6 +190,14 @@ export async function cancelBooking(req, res) {
       await event.save();
     }
 
+    // Send booking cancellation notification
+    await createNotification({
+      userId: req.user.userId,
+      type: "booking",
+      message: `Your booking for "${event.title}" has been cancelled.`,
+      metadata: { bookingId: booking._id, eventId: event._id },
+    });
+
     res.json({ message: "Booking cancelled successfully", booking });
   } catch (error) {
     console.error("Cancel booking error:", error);
@@ -222,15 +247,20 @@ export async function stripeWebhook(req, res) {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  switch (event.type) {
-    case "payment_intent.succeeded":
-      await handlePaymentSuccess(event.data.object);
-      break;
-    case "payment_intent.payment_failed":
-      await handlePaymentFailure(event.data.object);
-      break;
-    default:
-      console.log(`Unhandled event type ${event.type}`);
+  try {
+    switch (event.type) {
+      case "payment_intent.succeeded":
+        await handlePaymentSuccess(event.data.object);
+        break;
+      case "payment_intent.payment_failed":
+        await handlePaymentFailure(event.data.object);
+        break;
+      default:
+        console.log(`Unhandled event type ${event.type}`);
+    }
+  } catch (error) {
+    console.error("Error handling webhook event:", error);
+    return res.status(500).send("Webhook handler error");
   }
 
   res.json({ received: true });
