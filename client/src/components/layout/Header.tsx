@@ -61,13 +61,14 @@ export function Header() {
 
           {/* Search and Auth */}
           <div className="flex items-center space-x-4">
+            {/* Search Button - Improved Visibility */}
             <Button
               variant="ghost"
               size="sm"
-              className="hidden md:flex relative overflow-hidden group transition-all duration-300 hover:bg-gray-800/50"
+              className="hidden md:flex relative overflow-hidden group transition-all duration-300 hover:bg-gray-800/50 border border-gray-600/50"
             >
-              <Search className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" />
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <Search className="h-4 w-4 text-gray-300 transition-transform duration-300 group-hover:scale-110 group-hover:text-white" />
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </Button>
 
             {user ? (
@@ -76,39 +77,39 @@ export function Header() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="relative overflow-hidden group transition-all duration-300 hover:bg-gray-800/50"
+                    className="relative overflow-hidden group transition-all duration-300 hover:bg-gray-800/50 border border-gray-600/50 text-gray-300 hover:text-white"
                   >
                     <User className="h-4 w-4 mr-2 transition-transform duration-300 group-hover:scale-110" />
                     Dashboard
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </Button>
                 </Link>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={logout}
-                  className="relative overflow-hidden border-gray-600 text-gray-300 hover:border-red-400 hover:text-red-300 transition-all duration-300 hover:bg-red-500/10"
+                  className="relative overflow-hidden border-gray-500 text-gray-300 hover:border-red-400 hover:text-red-300 transition-all duration-300 hover:bg-red-500/10"
                 >
                   Logout
-                  <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-pink-500/10 opacity-0 hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 to-pink-500/20 opacity-0 hover:opacity-100 transition-opacity duration-300" />
                 </Button>
               </div>
             ) : (
               <div className="flex items-center space-x-3">
                 <Link href="/auth/login">
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
-                    className="relative overflow-hidden group transition-all duration-300 hover:bg-gray-800/50"
+                    className="relative overflow-hidden group transition-all duration-300 hover:bg-gray-800/50 border border-gray-500 text-gray-700 hover:text-white hover:border-blue-400"
                   >
                     Login
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </Button>
                 </Link>
                 <Link href="/auth/register">
                   <Button
                     size="sm"
-                    className="relative overflow-hidden bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 group"
+                    className="relative overflow-hidden bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 group border-0"
                   >
                     <span className="relative z-10">Sign Up</span>
                     <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -121,13 +122,13 @@ export function Header() {
             <Button
               variant="ghost"
               size="sm"
-              className="md:hidden relative overflow-hidden transition-all duration-300 hover:bg-gray-800/50"
+              className="md:hidden relative overflow-hidden transition-all duration-300 hover:bg-gray-800/50 border border-gray-600/50"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               {isMenuOpen ? (
-                <X className="h-5 w-5 transition-transform duration-300 rotate-90 scale-110" />
+                <X className="h-5 w-5 text-gray-300 transition-transform duration-300 rotate-90 scale-110" />
               ) : (
-                <Menu className="h-5 w-5 transition-transform duration-300 hover:scale-110" />
+                <Menu className="h-5 w-5 text-gray-300 transition-transform duration-300 hover:scale-110" />
               )}
             </Button>
           </div>
@@ -151,7 +152,7 @@ export function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-sm font-medium text-gray-300 hover:text-white transition-all duration-300 transform hover:translate-x-2"
+                className="text-sm font-medium text-gray-300 hover:text-white transition-all duration-300 transform hover:translate-x-2 py-2 px-4 rounded-lg hover:bg-gray-800/50"
                 style={{
                   animationDelay: isMenuOpen ? `${index * 100}ms` : "0ms",
                   animation: isMenuOpen

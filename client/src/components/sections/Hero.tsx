@@ -228,30 +228,6 @@ export function Hero() {
               </Link>
             </motion.div>
           </motion.div>
-
-          {/* Stats */}
-          <motion.div
-            variants={itemVariants}
-            className="mt-16 grid grid-cols-3 gap-8 max-w-2xl mx-auto"
-          >
-            {[
-              { number: "500+", label: "Events Monthly" },
-              { number: "50K+", label: "Active Users" },
-              { number: "100+", label: "Cities" },
-            ].map((stat) => (
-              <motion.div
-                key={stat.label}
-                className="text-center"
-                whileHover={{ scale: 1.1 }}
-                transition={{ type: "spring", stiffness: 300 }}
-              >
-                <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                  {stat.number}
-                </div>
-                <div className="text-sm text-gray-400 mt-2">{stat.label}</div>
-              </motion.div>
-            ))}
-          </motion.div>
         </motion.div>
       </div>
     </section>

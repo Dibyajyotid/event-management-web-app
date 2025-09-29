@@ -297,33 +297,6 @@ export function Testimonials() {
             </motion.div>
           ))}
         </motion.div>
-
-        {/* Stats Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ delay: 1 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16 pt-8 border-t border-gray-700/50"
-        >
-          {[
-            { number: "10K+", label: "Active Users" },
-            { number: "4.9/5", label: "Average Rating" },
-            { number: "500+", label: "Events Monthly" },
-            { number: "98%", label: "Satisfaction Rate" },
-          ].map((stat, index) => (
-            <motion.div
-              key={stat.label}
-              className="text-center"
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
-                {stat.number}
-              </div>
-              <div className="text-sm text-gray-400 mt-2">{stat.label}</div>
-            </motion.div>
-          ))}
-        </motion.div>
       </div>
     </section>
   );
