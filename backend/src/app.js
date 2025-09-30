@@ -8,13 +8,13 @@ import eventRoutes from "./routes/event.routes.js";
 import bookingRoutes from "./routes/booking.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import adminRoutes from "./routes/admin.route.js";
-import notificationRoutes from "./routes/notifications";
+import notificationRoutes from "./routes/notification.routes.js";
 import recommendationRoutes from "./routes/recommendation.route.js";
 // import socialRoutes from "./routes/social.route.js";
 import searchRoutes from "./routes/search.routes.js";
 
 // Middleware
-import errorHandler from "./middleware/errorHandler.middleware.js";
+import errorHandler from "./middlewares/errorHandler.middleware.js";
 
 config();
 
@@ -50,7 +50,7 @@ app.get("/api/health", (req, res) => {
 app.use(errorHandler);
 
 // 404 handler
-app.use("*", (req, res) => {
+app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 

@@ -1,8 +1,11 @@
-import stripe from "stripe";
+import Stripe from "stripe";
 import Booking from "../models/booking.model.js";
 import Event from "../models/event.model.js";
+import { config } from "dotenv";
 
-const stripeClient = stripe(process.env.STRIPE_SECRET_KEY);
+config();
+
+export const stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function processPayment(booking, paymentMethodId) {
   const totalAmount = booking.totalAmount;

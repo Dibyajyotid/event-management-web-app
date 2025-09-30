@@ -24,9 +24,10 @@ export function FeaturedEvents() {
         `${process.env.NEXT_PUBLIC_API_URL}/api/events/featured/list`
       );
       const data = await response.json();
-      setEvents(data);
+      setEvents(Array.isArray(data.events) ? data.events : []);
     } catch (error) {
       console.error("Error fetching featured events:", error);
+      setEvents([]);
     } finally {
       setLoading(false);
     }

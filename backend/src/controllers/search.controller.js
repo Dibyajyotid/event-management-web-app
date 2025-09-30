@@ -1,4 +1,4 @@
-import Event from "../models/event.model,js";
+import Event from "../models/event.model.js";
 import User from "../models/user.model.js";
 
 // Advanced event search

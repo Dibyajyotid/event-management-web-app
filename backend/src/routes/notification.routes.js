@@ -1,10 +1,11 @@
 import express from "express";
-import authenticateToken from "../middleware/auth.middleware.js";
+
 import {
   getMyNotifications,
   markNotificationRead,
   markAllNotificationsRead,
 } from "../controllers/notification.controller.js";
+import authenticateToken from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
