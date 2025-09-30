@@ -27,7 +27,7 @@ export async function register(req, res) {
     await user.save();
 
     // Generate JWT
-    const token = generateToken(user._id, res);
+    const token = generateToken(user, res);
 
     res.status(201).json({
       message: "User registered successfully",
@@ -69,7 +69,7 @@ export async function login(req, res) {
     }
 
     // Generate JWT
-    const token = generateToken(user._id, res);
+    const token = generateToken(user, res);
 
     res.json({
       message: "Login successful",

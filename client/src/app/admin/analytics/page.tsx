@@ -1,10 +1,16 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
-import { AdminLayout } from "@/components/layout/AdminLayout"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useState, useEffect } from "react";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { AdminLayout } from "@/components/layout/AdminLayout";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Bar,
   XAxis,
@@ -17,54 +23,56 @@ import {
   PieChart,
   Pie,
   Cell,
-} from "recharts"
-import { TrendingUp, Users, Calendar, DollarSign } from "lucide-react"
+} from "recharts";
+import { TrendingUp, Users, Calendar, DollarSign } from "lucide-react";
 
 interface AnalyticsData {
   overview: {
-    totalUsers: number
-    totalEvents: number
-    totalBookings: number
-    totalRevenue: number
-    userGrowth: number
-    eventGrowth: number
-    bookingGrowth: number
-    revenueGrowth: number
-  }
-  eventsByCategory: Array<{ category: string; count: number }>
-  bookingsByMonth: Array<{ month: string; bookings: number; revenue: number }>
-  topEvents: Array<{ title: string; bookings: number; revenue: number }>
+    totalUsers: number;
+    totalEvents: number;
+    totalBookings: number;
+    totalRevenue: number;
+    userGrowth: number;
+    eventGrowth: number;
+    bookingGrowth: number;
+    revenueGrowth: number;
+  };
+  eventsByCategory: Array<{ category: string; count: number }>;
+  bookingsByMonth: Array<{ month: string; bookings: number; revenue: number }>;
+  topEvents: Array<{ title: string; bookings: number; revenue: number }>;
 }
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"]
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 
 export default function AdminAnalyticsPage() {
-  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [timeRange, setTimeRange] = useState("30")
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [timeRange, setTimeRange] = useState("30");
 
   useEffect(() => {
-    fetchAnalytics()
-  }, [timeRange])
+    fetchAnalytics();
+  }, [timeRange]);
 
   const fetchAnalytics = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/analytics?days=${timeRange}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      })
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/admin/stats?days=${timeRange}`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
 
       if (response.ok) {
-        const data = await response.json()
-        setAnalytics(data)
+        const data = await response.json();
+        setAnalytics(data);
       }
     } catch (error) {
-      console.error("Error fetching analytics:", error)
+      console.error("Error fetching analytics:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -85,7 +93,7 @@ export default function AdminAnalyticsPage() {
           </div>
         </AdminLayout>
       </ProtectedRoute>
-    )
+    );
   }
 
   if (!analytics) {
@@ -93,11 +101,13 @@ export default function AdminAnalyticsPage() {
       <ProtectedRoute requiredRole="admin">
         <AdminLayout>
           <div className="text-center py-8">
-            <p className="text-muted-foreground">Failed to load analytics data</p>
+            <p className="text-muted-foreground">
+              Failed to load analytics data
+            </p>
           </div>
         </AdminLayout>
       </ProtectedRoute>
-    )
+    );
   }
 
   return (
@@ -107,7 +117,9 @@ export default function AdminAnalyticsPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold">Analytics Dashboard</h1>
-              <p className="text-muted-foreground">Monitor platform performance and user behavior</p>
+              <p className="text-muted-foreground">
+                Monitor platform performance and user behavior
+              </p>
             </div>
             <Select value={timeRange} onValueChange={setTimeRange}>
               <SelectTrigger className="w-40">
@@ -126,13 +138,23 @@ export default function AdminAnalyticsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Total Users
+                </CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{analytics.overview.totalUsers.toLocaleString()}</div>
+                <div className="text-2xl font-bold">
+                  {analytics.overview.totalUsers.toLocaleString()}
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  <span className={analytics.overview.userGrowth >= 0 ? "text-green-600" : "text-red-600"}>
+                  <span
+                    className={
+                      analytics.overview.userGrowth >= 0
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }
+                  >
                     {analytics.overview.userGrowth >= 0 ? "+" : ""}
                     {analytics.overview.userGrowth}%
                   </span>{" "}
@@ -143,13 +165,23 @@ export default function AdminAnalyticsPage() {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Events</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Total Events
+                </CardTitle>
                 <Calendar className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{analytics.overview.totalEvents.toLocaleString()}</div>
+                <div className="text-2xl font-bold">
+                  {analytics.overview.totalEvents.toLocaleString()}
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  <span className={analytics.overview.eventGrowth >= 0 ? "text-green-600" : "text-red-600"}>
+                  <span
+                    className={
+                      analytics.overview.eventGrowth >= 0
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }
+                  >
                     {analytics.overview.eventGrowth >= 0 ? "+" : ""}
                     {analytics.overview.eventGrowth}%
                   </span>{" "}
@@ -160,13 +192,23 @@ export default function AdminAnalyticsPage() {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Bookings</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Total Bookings
+                </CardTitle>
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{analytics.overview.totalBookings.toLocaleString()}</div>
+                <div className="text-2xl font-bold">
+                  {analytics.overview.totalBookings.toLocaleString()}
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  <span className={analytics.overview.bookingGrowth >= 0 ? "text-green-600" : "text-red-600"}>
+                  <span
+                    className={
+                      analytics.overview.bookingGrowth >= 0
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }
+                  >
                     {analytics.overview.bookingGrowth >= 0 ? "+" : ""}
                     {analytics.overview.bookingGrowth}%
                   </span>{" "}
@@ -177,13 +219,23 @@ export default function AdminAnalyticsPage() {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Total Revenue
+                </CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${analytics.overview.totalRevenue.toLocaleString()}</div>
+                <div className="text-2xl font-bold">
+                  ${analytics.overview.totalRevenue.toLocaleString()}
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  <span className={analytics.overview.revenueGrowth >= 0 ? "text-green-600" : "text-red-600"}>
+                  <span
+                    className={
+                      analytics.overview.revenueGrowth >= 0
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }
+                  >
                     {analytics.overview.revenueGrowth >= 0 ? "+" : ""}
                     {analytics.overview.revenueGrowth}%
                   </span>{" "}
@@ -207,8 +259,19 @@ export default function AdminAnalyticsPage() {
                     <YAxis yAxisId="left" />
                     <YAxis yAxisId="right" orientation="right" />
                     <Tooltip />
-                    <Bar yAxisId="left" dataKey="bookings" fill="#8884d8" name="Bookings" />
-                    <Line yAxisId="right" type="monotone" dataKey="revenue" stroke="#82ca9d" name="Revenue ($)" />
+                    <Bar
+                      yAxisId="left"
+                      dataKey="bookings"
+                      fill="#8884d8"
+                      name="Bookings"
+                    />
+                    <Line
+                      yAxisId="right"
+                      type="monotone"
+                      dataKey="revenue"
+                      stroke="#82ca9d"
+                      name="Revenue ($)"
+                    />
                   </LineChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -226,13 +289,18 @@ export default function AdminAnalyticsPage() {
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ category, percent }) => `${category} ${(percent * 100).toFixed(0)}%`}
+                      label={({ category, percent }) =>
+                        `${category} ${(percent * 100).toFixed(0)}%`
+                      }
                       outerRadius={80}
                       fill="#8884d8"
                       dataKey="count"
                     >
                       {analytics.eventsByCategory.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
                       ))}
                     </Pie>
                     <Tooltip />
@@ -250,13 +318,20 @@ export default function AdminAnalyticsPage() {
             <CardContent>
               <div className="space-y-4">
                 {analytics.topEvents.map((event, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-4 border rounded-lg"
+                  >
                     <div>
                       <h3 className="font-semibold">{event.title}</h3>
-                      <p className="text-sm text-muted-foreground">{event.bookings} bookings</p>
+                      <p className="text-sm text-muted-foreground">
+                        {event.bookings} bookings
+                      </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold">${event.revenue.toLocaleString()}</p>
+                      <p className="font-semibold">
+                        ${event.revenue.toLocaleString()}
+                      </p>
                       <p className="text-sm text-muted-foreground">revenue</p>
                     </div>
                   </div>
@@ -267,5 +342,5 @@ export default function AdminAnalyticsPage() {
         </div>
       </AdminLayout>
     </ProtectedRoute>
-  )
+  );
 }
