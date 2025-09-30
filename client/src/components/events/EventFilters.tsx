@@ -1,27 +1,37 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Filter, X } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Filter, X } from "lucide-react";
 
 interface Filters {
-  category: string
-  location: string
-  startDate: string
-  endDate: string
+  category: string;
+  location: string;
+  startDate: string;
+  endDate: string;
 }
 
 interface EventFiltersProps {
-  filters: Filters
-  onFiltersChange: (filters: Filters) => void
+  filters: Filters;
+  onFiltersChange: (filters: Filters) => void;
 }
 
 export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
   const categories = [
-    { value: "", label: "All Categories" },
+    { value: "all", label: "All Categories" },
     { value: "conference", label: "Conference" },
     { value: "workshop", label: "Workshop" },
     { value: "seminar", label: "Seminar" },
@@ -29,14 +39,16 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
     { value: "entertainment", label: "Entertainment" },
     { value: "sports", label: "Sports" },
     { value: "other", label: "Other" },
-  ]
+  ];
 
   const updateFilter = (key: keyof Filters, value: string) => {
+    // Treat "all" as empty string for backend query
+    const normalizedValue = value === "all" ? "" : value;
     onFiltersChange({
       ...filters,
-      [key]: value,
-    })
-  }
+      [key]: normalizedValue,
+    });
+  };
 
   const clearFilters = () => {
     onFiltersChange({
@@ -44,15 +56,18 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
       location: "",
       startDate: "",
       endDate: "",
-    })
-  }
+    });
+  };
 
-  const hasActiveFilters = Object.values(filters).some((value) => value !== "")
+  const hasActiveFilters = Object.values(filters).some((value) => value !== "");
 
   return (
     <div className="flex flex-wrap gap-4 items-center">
       {/* Category Filter */}
-      <Select value={filters.category} onValueChange={(value) => updateFilter("category", value)}>
+      <Select
+        value={filters.category || "all"}
+        onValueChange={(value) => updateFilter("category", value)}
+      >
         <SelectTrigger className="w-40">
           <SelectValue placeholder="Category" />
         </SelectTrigger>
@@ -113,5 +128,5 @@ export function EventFilters({ filters, onFiltersChange }: EventFiltersProps) {
         </Button>
       )}
     </div>
-  )
+  );
 }

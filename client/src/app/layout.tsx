@@ -37,7 +37,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-background font-sans">
         <AuthProvider>
           {children}
-          <Toaster />
+          <Toaster richColors />
         </AuthProvider>
       </body>
     </html>

@@ -1,95 +1,89 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Star, MessageSquare } from "lucide-react"
-import { useAuth } from "@/contexts/AuthContext"
-
-interface Event {
-  _id: string
-  averageRating: number
-  totalRatings: number
-  ratings: Array<{
-    _id: string
-    user: {
-      firstName: string
-      lastName: string
-    }
-    rating: number
-    comment: string
-    createdAt: string
-  }>
-}
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Star, MessageSquare } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Event } from "@/types/eventTypes";
 
 interface EventReviewsProps {
-  event: Event
+  event: Event;
 }
 
 export function EventReviews({ event }: EventReviewsProps) {
-  const { user } = useAuth()
-  const [showReviewForm, setShowReviewForm] = useState(false)
-  const [rating, setRating] = useState(0)
-  const [comment, setComment] = useState("")
-  const [loading, setLoading] = useState(false)
+  const { user } = useAuth();
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
-    })
-  }
+    });
+  };
 
   const handleSubmitReview = async () => {
-    if (!user || rating === 0) return
+    if (!user || rating === 0) return;
 
-    setLoading(true)
+    setLoading(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/events/${event._id}/rating`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({ rating, comment }),
-      })
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/events/${event._id}/rating`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({ rating, comment }),
+        }
+      );
 
       if (response.ok) {
-        setShowReviewForm(false)
-        setRating(0)
-        setComment("")
+        setShowReviewForm(false);
+        setRating(0);
+        setComment("");
         // Refresh the page or update the reviews
-        window.location.reload()
+        window.location.reload();
       }
     } catch (error) {
-      console.error("Error submitting review:", error)
+      console.error("Error submitting review:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const StarRating = ({
     value,
     onChange,
     readonly = false,
-  }: { value: number; onChange?: (rating: number) => void; readonly?: boolean }) => {
+  }: {
+    value: number;
+    onChange?: (rating: number) => void;
+    readonly?: boolean;
+  }) => {
     return (
       <div className="flex gap-1">
         {[1, 2, 3, 4, 5].map((star) => (
           <Star
             key={star}
             className={`h-4 w-4 ${
-              star <= value ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"
+              star <= value
+                ? "fill-yellow-400 text-yellow-400"
+                : "text-muted-foreground"
             } ${!readonly ? "cursor-pointer" : ""}`}
             onClick={() => !readonly && onChange && onChange(star)}
           />
         ))}
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <Card>
@@ -100,7 +94,11 @@ export function EventReviews({ event }: EventReviewsProps) {
             Reviews & Ratings
           </CardTitle>
           {user && (
-            <Button variant="outline" size="sm" onClick={() => setShowReviewForm(!showReviewForm)}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowReviewForm(!showReviewForm)}
+            >
               Write Review
             </Button>
           )}
@@ -109,9 +107,13 @@ export function EventReviews({ event }: EventReviewsProps) {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <StarRating value={Math.round(event.averageRating)} readonly />
-              <span className="text-lg font-semibold">{event.averageRating.toFixed(1)}</span>
+              <span className="text-lg font-semibold">
+                {event.averageRating.toFixed(1)}
+              </span>
             </div>
-            <span className="text-muted-foreground">({event.totalRatings} reviews)</span>
+            <span className="text-muted-foreground">
+              ({event.totalRatings} reviews)
+            </span>
           </div>
         )}
       </CardHeader>
@@ -120,11 +122,15 @@ export function EventReviews({ event }: EventReviewsProps) {
         {showReviewForm && (
           <div className="p-4 border rounded-lg space-y-4">
             <div>
-              <label className="text-sm font-medium mb-2 block">Your Rating</label>
+              <label className="text-sm font-medium mb-2 block">
+                Your Rating
+              </label>
               <StarRating value={rating} onChange={setRating} />
             </div>
             <div>
-              <label className="text-sm font-medium mb-2 block">Your Review</label>
+              <label className="text-sm font-medium mb-2 block">
+                Your Review
+              </label>
               <Textarea
                 placeholder="Share your experience..."
                 value={comment}
@@ -133,10 +139,16 @@ export function EventReviews({ event }: EventReviewsProps) {
               />
             </div>
             <div className="flex gap-2">
-              <Button onClick={handleSubmitReview} disabled={loading || rating === 0}>
+              <Button
+                onClick={handleSubmitReview}
+                disabled={loading || rating === 0}
+              >
                 Submit Review
               </Button>
-              <Button variant="outline" onClick={() => setShowReviewForm(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setShowReviewForm(false)}
+              >
                 Cancel
               </Button>
             </div>
@@ -147,7 +159,10 @@ export function EventReviews({ event }: EventReviewsProps) {
         {event.ratings && event.ratings.length > 0 ? (
           <div className="space-y-4">
             {event.ratings.map((review) => (
-              <div key={review._id} className="flex gap-4 p-4 border rounded-lg">
+              <div
+                key={review._id}
+                className="flex gap-4 p-4 border rounded-lg"
+              >
                 <Avatar className="h-10 w-10">
                   <AvatarFallback>
                     {review.user.firstName[0]}
@@ -160,11 +175,17 @@ export function EventReviews({ event }: EventReviewsProps) {
                       <div className="font-medium">
                         {review.user.firstName} {review.user.lastName}
                       </div>
-                      <div className="text-sm text-muted-foreground">{formatDate(review.createdAt)}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {formatDate(review.createdAt)}
+                      </div>
                     </div>
                     <StarRating value={review.rating} readonly />
                   </div>
-                  {review.comment && <p className="text-sm text-muted-foreground">{review.comment}</p>}
+                  {review.comment && (
+                    <p className="text-sm text-muted-foreground">
+                      {review.comment}
+                    </p>
+                  )}
                 </div>
               </div>
             ))}
@@ -177,5 +198,5 @@ export function EventReviews({ event }: EventReviewsProps) {
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

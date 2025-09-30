@@ -4,37 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Calendar, MapPin, Clock, Users, Tag, Star } from "lucide-react"
-
-interface Event {
-  _id: string
-  title: string
-  description: string
-  category: string
-  startDate: string
-  endDate: string
-  venue: {
-    name: string
-    address: string
-    city: string
-    state: string
-    country: string
-  }
-  isVirtual: boolean
-  virtualLink?: string
-  images: string[]
-  organizer: {
-    _id: string
-    firstName: string
-    lastName: string
-    email: string
-    avatar?: string
-  }
-  tags: string[]
-  averageRating: number
-  totalRatings: number
-  capacity: number
-  attendees: string[]
-}
+import { Event } from "@/types/eventTypes"
 
 interface EventDetailsProps {
   event: Event
@@ -122,9 +92,9 @@ export function EventDetails({ event }: EventDetailsProps) {
                   <div className="text-sm text-muted-foreground">Virtual Event</div>
                 ) : (
                   <>
-                    <div className="text-sm text-muted-foreground">{event.venue.name}</div>
+                    <div className="text-sm text-muted-foreground">{event.venue?.name}</div>
                     <div className="text-sm text-muted-foreground">
-                      {event.venue.city}, {event.venue.state}
+                      {event.venue?.city}, {event.venue?.state}
                     </div>
                   </>
                 )}

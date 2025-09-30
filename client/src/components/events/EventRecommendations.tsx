@@ -39,15 +39,16 @@ export function EventRecommendations() {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/recommendations`,
         {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+          method: "GET",
+          credentials: "include",
         }
       );
 
       if (response.ok) {
         const data: RecommendationsData = await response.json();
         setRecommendations(data);
+      } else if (response.status === 204) {
+        console.warn("Unauthorized: user may need to login again");
       }
     } catch (error) {
       console.error("Error fetching recommendations:", error);

@@ -1,3 +1,4 @@
+import { User } from "./userTypes";
 export type Event = {
   _id: string;
   title: string;
@@ -15,6 +16,7 @@ export type Event = {
     firstName: string;
     lastName: string;
     email?: string;
+    avatar: string;
   };
   venue: {
     name: string;
@@ -45,7 +47,8 @@ export type Event = {
   capacity: number;
   attendees: string[];
   ratings: {
-    user: string;
+    _id: string;
+    user: User;
     rating: number;
     comment?: string;
     createdAt: string;

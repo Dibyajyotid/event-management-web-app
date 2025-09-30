@@ -16,52 +16,68 @@ export const getAllEvents = async (req, res) => {
       sortOrder = "asc",
     } = req.query;
 
-    // Build filter object
+    const pageNumber = Number(page) || 1;
+    const limitNumber = Number(limit) || 12;
+
+    // Base filter: only published events
     const filter = { status: "published" };
 
-    if (category) {
+    // Category filter
+    if (category && category.trim() !== "") {
       filter.category = category;
     }
 
-    if (location) {
-      filter.$or = [
+    // Combine OR conditions for location and search
+    const orConditions = [];
+
+    if (location && location.trim() !== "") {
+      orConditions.push(
         { "venue.city": { $regex: location, $options: "i" } },
         { "venue.state": { $regex: location, $options: "i" } },
-        { "venue.country": { $regex: location, $options: "i" } },
-      ];
+        { "venue.country": { $regex: location, $options: "i" } }
+      );
     }
 
-    if (startDate || endDate) {
-      filter.startDate = {};
-      if (startDate) filter.startDate.$gte = new Date(startDate);
-      if (endDate) filter.startDate.$lte = new Date(endDate);
-    }
-
-    if (search) {
-      filter.$or = [
+    if (search && search.trim() !== "") {
+      orConditions.push(
         { title: { $regex: search, $options: "i" } },
         { description: { $regex: search, $options: "i" } },
-        { tags: { $in: [new RegExp(search, "i")] } },
-      ];
+        { tags: { $in: [new RegExp(search, "i")] } }
+      );
     }
 
-    // Build sort object
+    if (orConditions.length > 0) {
+      filter.$or = orConditions;
+    }
+
+    // Date filters
+    if (startDate && startDate.trim() !== "") {
+      filter.startDate = { $gte: new Date(startDate) };
+    }
+
+    if (endDate && endDate.trim() !== "") {
+      filter.endDate = filter.endDate || {};
+      filter.endDate.$lte = new Date(endDate);
+    }
+
+    // Sorting
     const sort = {};
     sort[sortBy] = sortOrder === "desc" ? -1 : 1;
 
+    // Query database
     const events = await Event.find(filter)
       .populate("organizer", "firstName lastName email")
       .sort(sort)
-      .limit(limit * 1)
-      .skip((page - 1) * limit)
+      .limit(limitNumber)
+      .skip((pageNumber - 1) * limitNumber)
       .exec();
 
     const total = await Event.countDocuments(filter);
 
     res.status(200).json({
       events,
-      totalPages: Math.ceil(total / limit),
-      currentPage: page,
+      totalPages: Math.ceil(total / limitNumber),
+      currentPage: pageNumber,
       total,
     });
   } catch (error) {

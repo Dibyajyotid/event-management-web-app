@@ -11,6 +11,7 @@ import userRoutes from "./routes/user.routes.js";
 import adminRoutes from "./routes/admin.route.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import recommendationRoutes from "./routes/recommendation.route.js";
+import commentRoutes from "./routes/comment.route.js";
 // import socialRoutes from "./routes/social.route.js";
 import searchRoutes from "./routes/search.routes.js";
 
@@ -40,6 +41,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/recommendations", recommendationRoutes);
+app.use("/api/comments", commentRoutes);
 // app.use("/api/social", socialRoutes);
 app.use("/api/search", searchRoutes);
 
