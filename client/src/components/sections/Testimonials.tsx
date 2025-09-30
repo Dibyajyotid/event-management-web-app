@@ -228,7 +228,7 @@ export function Testimonials() {
                     animate={{ opacity: 1 }}
                     transition={{ delay: index * 0.1 + 0.4 }}
                   >
-                    "{testimonial.content}"
+                    {testimonial.content}
                   </motion.p>
 
                   {/* User Info */}

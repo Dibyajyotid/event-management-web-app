@@ -25,7 +25,11 @@ export function RealtimeUpdates({ eventId }: RealtimeUpdatesProps) {
             {newComments.map((c, i) => (
               <li key={i}>
                 {c.user.firstName} {c.user.lastName}:{" "}
-                {c.comment || "No content"}
+                {typeof c.comment === "string" || typeof c.comment === "number"
+                  ? c.comment
+                  : c.comment
+                  ? String(c.comment)
+                  : "No content"}
               </li>
             ))}
           </ul>

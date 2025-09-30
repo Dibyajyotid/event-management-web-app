@@ -12,19 +12,25 @@ interface BookingUpdate {
 
 interface Comment {
   user: { firstName: string; lastName: string };
-  [key: string]: any;
+  [key: string]: string | number | boolean | object | null;
 }
 
 export function useRealtimeUpdates(eventId?: string) {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [connected, setConnected] = useState(false);
-  const [bookingData, setBookingData] = useState<{ availableSpots: number; totalBookings: number } | null>(null);
+  const [bookingData, setBookingData] = useState<{
+    availableSpots: number;
+    totalBookings: number;
+  } | null>(null);
   const [newComments, setNewComments] = useState<Comment[]>([]);
 
   useEffect(() => {
-    const newSocket = io(process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000", {
-      transports: ["websocket", "polling"],
-    });
+    const newSocket = io(
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000",
+      {
+        transports: ["websocket", "polling"],
+      }
+    );
 
     newSocket.on("connect", () => {
       setConnected(true);
@@ -37,14 +43,19 @@ export function useRealtimeUpdates(eventId?: string) {
 
     newSocket.on("booking-update", (data: BookingUpdate) => {
       if (!eventId || data.eventId === eventId) {
-        setBookingData({ availableSpots: data.availableSpots, totalBookings: data.totalBookings });
+        setBookingData({
+          availableSpots: data.availableSpots,
+          totalBookings: data.totalBookings,
+        });
       }
       toast.success(`${data.availableSpots} spots remaining for this event`);
     });
 
     newSocket.on("comment-added", (comment: Comment) => {
       setNewComments((prev) => [...prev, comment]);
-      toast(`${comment.user.firstName} ${comment.user.lastName} added a comment`);
+      toast(
+        `${comment.user.firstName} ${comment.user.lastName} added a comment`
+      );
     });
 
     newSocket.on("event-updated", (eventData: { title: string }) => {
@@ -69,5 +80,12 @@ export function useRealtimeUpdates(eventId?: string) {
 
   const clearNewComments = () => setNewComments([]);
 
-  return { connected, bookingData, newComments, emitBookingUpdate, emitNewComment, clearNewComments };
+  return {
+    connected,
+    bookingData,
+    newComments,
+    emitBookingUpdate,
+    emitNewComment,
+    clearNewComments,
+  };
 }
