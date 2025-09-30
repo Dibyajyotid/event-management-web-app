@@ -12,34 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, Grid, List } from "lucide-react"
 import { Loader2 } from "lucide-react"
-
-interface Event {
-  _id: string
-  title: string
-  description: string
-  category: string
-  startDate: string
-  endDate: string
-  venue: {
-    name: string
-    city: string
-    state: string
-  }
-  isVirtual: boolean
-  images: string[]
-  ticketTypes: Array<{
-    name: string
-    price: number
-    quantity: number
-    sold: number
-  }>
-  organizer: {
-    firstName: string
-    lastName: string
-  }
-  averageRating: number
-  totalRatings: number
-}
+import { Event } from "@/types/eventTypes"
 
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([])
