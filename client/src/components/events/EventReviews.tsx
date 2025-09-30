@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Star, MessageSquare } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Event } from "@/types/eventTypes";
+import { toast } from "sonner";
 
 interface EventReviewsProps {
   event: Event;
@@ -19,14 +20,40 @@ export function EventReviews({ event }: EventReviewsProps) {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
+  const [reviews, setReviews] = useState(event.ratings || []);
+  const [averageRating, setAverageRating] = useState(event.averageRating);
+  const [totalRatings, setTotalRatings] = useState(event.totalRatings);
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
     });
-  };
+
+  const StarRating = ({
+    value,
+    onChange,
+    readonly = false,
+  }: {
+    value: number;
+    onChange?: (rating: number) => void;
+    readonly?: boolean;
+  }) => (
+    <div className="flex gap-1">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <Star
+          key={star}
+          className={`h-4 w-4 ${
+            star <= value
+              ? "fill-yellow-400 text-yellow-400"
+              : "text-muted-foreground"
+          } ${!readonly ? "cursor-pointer" : ""}`}
+          onClick={() => !readonly && onChange && onChange(star)}
+        />
+      ))}
+    </div>
+  );
 
   const handleSubmitReview = async () => {
     if (!user || rating === 0) return;
@@ -46,43 +73,26 @@ export function EventReviews({ event }: EventReviewsProps) {
       );
 
       if (response.ok) {
+        const newReview = await response.json(); // backend should return the new review
+        setReviews((prev) => [newReview, ...prev]);
+        setTotalRatings((prev) => prev + 1);
+        setAverageRating(
+          (prevAvg) =>
+            (prevAvg * reviews.length + rating) / (reviews.length + 1)
+        );
+
         setShowReviewForm(false);
         setRating(0);
         setComment("");
-        // Refresh the page or update the reviews
-        window.location.reload();
+
+        toast.success("Review submitted successfully!");
       }
     } catch (error) {
       console.error("Error submitting review:", error);
+      toast.error("Failed to submit review");
     } finally {
       setLoading(false);
     }
-  };
-
-  const StarRating = ({
-    value,
-    onChange,
-    readonly = false,
-  }: {
-    value: number;
-    onChange?: (rating: number) => void;
-    readonly?: boolean;
-  }) => {
-    return (
-      <div className="flex gap-1">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <Star
-            key={star}
-            className={`h-4 w-4 ${
-              star <= value
-                ? "fill-yellow-400 text-yellow-400"
-                : "text-muted-foreground"
-            } ${!readonly ? "cursor-pointer" : ""}`}
-            onClick={() => !readonly && onChange && onChange(star)}
-          />
-        ))}
-      </div>
-    );
   };
 
   return (
@@ -103,22 +113,21 @@ export function EventReviews({ event }: EventReviewsProps) {
             </Button>
           )}
         </div>
-        {event.totalRatings > 0 && (
+        {totalRatings > 0 && (
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <StarRating value={Math.round(event.averageRating)} readonly />
+              <StarRating value={Math.round(averageRating)} readonly />
               <span className="text-lg font-semibold">
-                {event.averageRating.toFixed(1)}
+                {averageRating.toFixed(1)}
               </span>
             </div>
             <span className="text-muted-foreground">
-              ({event.totalRatings} reviews)
+              ({totalRatings} reviews)
             </span>
           </div>
         )}
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Review Form */}
         {showReviewForm && (
           <div className="p-4 border rounded-lg space-y-4">
             <div>
@@ -155,10 +164,9 @@ export function EventReviews({ event }: EventReviewsProps) {
           </div>
         )}
 
-        {/* Reviews List */}
-        {event.ratings && event.ratings.length > 0 ? (
+        {reviews.length > 0 ? (
           <div className="space-y-4">
-            {event.ratings.map((review) => (
+            {reviews.map((review) => (
               <div
                 key={review._id}
                 className="flex gap-4 p-4 border rounded-lg"
