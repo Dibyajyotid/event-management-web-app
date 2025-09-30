@@ -1,18 +1,24 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Calendar, Eye, EyeOff, Loader2 } from "lucide-react"
-import { useAuth } from "@/contexts/AuthContext"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Calendar, Eye, EyeOff, Loader2 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -21,39 +27,39 @@ export default function RegisterPage() {
     email: "",
     password: "",
     confirmPassword: "",
-  })
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [acceptTerms, setAcceptTerms] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const { register } = useAuth()
-  const router = useRouter()
+  const { register } = useAuth();
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
-    })
-  }
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError("")
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
     // Validation
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match")
-      setLoading(false)
-      return
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
     }
 
     if (!acceptTerms) {
-      setError("Please accept the terms and conditions")
-      setLoading(false)
-      return
+      setError("Please accept the terms and conditions");
+      setLoading(false);
+      return;
     }
 
     try {
@@ -62,14 +68,14 @@ export default function RegisterPage() {
         lastName: formData.lastName,
         email: formData.email,
         password: formData.password,
-      })
-      router.push("/dashboard")
-    } catch (err: any) {
-      setError(err.message || "Registration failed")
+      });
+      router.push("/dashboard");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Registration failed");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background grid-pattern p-4">
@@ -85,7 +91,9 @@ export default function RegisterPage() {
         <Card className="card-hover">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl">Create Account</CardTitle>
-            <CardDescription>Join EventHub to discover amazing events</CardDescription>
+            <CardDescription>
+              Join EventHub to discover amazing events
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -201,7 +209,9 @@ export default function RegisterPage() {
                 <Checkbox
                   id="terms"
                   checked={acceptTerms}
-                  onCheckedChange={(checked) => setAcceptTerms(checked as boolean)}
+                  onCheckedChange={(checked) =>
+                    setAcceptTerms(checked as boolean)
+                  }
                 />
                 <Label htmlFor="terms" className="text-sm">
                   I agree to the{" "}
@@ -209,13 +219,20 @@ export default function RegisterPage() {
                     Terms of Service
                   </Link>{" "}
                   and{" "}
-                  <Link href="/privacy" className="text-primary hover:underline">
+                  <Link
+                    href="/privacy"
+                    className="text-primary hover:underline"
+                  >
                     Privacy Policy
                   </Link>
                 </Label>
               </div>
 
-              <Button type="submit" className="w-full btn-animate" disabled={loading}>
+              <Button
+                type="submit"
+                className="w-full btn-animate"
+                disabled={loading}
+              >
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -230,7 +247,10 @@ export default function RegisterPage() {
             <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
                 Already have an account?{" "}
-                <Link href="/auth/login" className="text-primary hover:underline">
+                <Link
+                  href="/auth/login"
+                  className="text-primary hover:underline"
+                >
                   Sign in
                 </Link>
               </p>
@@ -239,5 +259,5 @@ export default function RegisterPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

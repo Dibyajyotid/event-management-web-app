@@ -125,8 +125,8 @@ export function EventBooking({ event }: EventBookingProps) {
 
       // Redirect to booking confirmation
       router.push(`/booking-confirmation/${data._id}`);
-    } catch (err: any) {
-      setError(err.message || "Booking failed");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Booking failed");
     } finally {
       setLoading(false);
     }

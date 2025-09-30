@@ -1,73 +1,51 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
-import { DashboardLayout } from "@/components/layout/DashboardLayout"
-import { EventCard } from "@/components/events/EventCard"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Heart, Search } from "lucide-react"
-import Link from "next/link"
-
-interface Event {
-  _id: string
-  title: string
-  description: string
-  category: string
-  startDate: string
-  endDate: string
-  venue: {
-    name: string
-    city: string
-    state: string
-  }
-  isVirtual: boolean
-  images: string[]
-  ticketTypes: Array<{
-    name: string
-    price: number
-    quantity: number
-    sold: number
-  }>
-  organizer: {
-    firstName: string
-    lastName: string
-  }
-  averageRating: number
-  totalRatings: number
-}
+import { useState, useEffect } from "react";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { EventCard } from "@/components/events/EventCard";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Heart, Search } from "lucide-react";
+import Link from "next/link";
+import { Event } from "@/types/eventTypes";
 
 export default function FavoritesPage() {
-  const [favorites, setFavorites] = useState<Event[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState("")
+  const [favorites, setFavorites] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    fetchFavorites()
-  }, [])
+    fetchFavorites();
+  }, []);
 
   const fetchFavorites = async () => {
     try {
       // This would be implemented in the backend
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/favorites`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      })
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/favorites`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
       if (response.ok) {
-        const data = await response.json()
-        setFavorites(data)
+        const data = await response.json();
+        setFavorites(data);
       }
     } catch (error) {
-      console.error("Error fetching favorites:", error)
+      console.error("Error fetching favorites:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const filteredFavorites = favorites.filter((event) => event.title.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredFavorites = favorites.filter((event) =>
+    event.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <ProtectedRoute>
@@ -75,7 +53,9 @@ export default function FavoritesPage() {
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold">Favorite Events</h1>
-            <p className="text-muted-foreground">Events you've saved for later</p>
+            <p className="text-muted-foreground">
+              Events you've saved for later
+            </p>
           </div>
 
           {/* Search */}
@@ -109,9 +89,11 @@ export default function FavoritesPage() {
             <Card>
               <CardContent className="p-12 text-center">
                 <Heart className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-semibold mb-2">No favorite events yet</h3>
+                <h3 className="text-lg font-semibold mb-2">
+                  No favorite events yet
+                </h3>
                 <p className="text-muted-foreground mb-4">
-                  Start exploring events and save the ones you're interested in.
+                  Start exploring events and save the ones you&apos;re interested in.
                 </p>
                 <Link href="/events">
                   <Button>Browse Events</Button>
@@ -128,5 +110,5 @@ export default function FavoritesPage() {
         </div>
       </DashboardLayout>
     </ProtectedRoute>
-  )
+  );
 }

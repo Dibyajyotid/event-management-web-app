@@ -116,7 +116,7 @@ export default function BookingConfirmationPage() {
         <Header />
         <div className="container mx-auto px-4 py-12 text-center">
           <h1 className="text-2xl font-bold mb-4">Booking Not Found</h1>
-          <p className="text-muted-foreground mb-8">The booking you're looking for doesn't exist.</p>
+          <p className="text-muted-foreground mb-8">The booking you&apos;re looking for doesn&apos;t exist.</p>
           <Link href="/dashboard/bookings">
             <Button>View My Bookings</Button>
           </Link>
@@ -136,7 +136,7 @@ export default function BookingConfirmationPage() {
             <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
             <h1 className="text-3xl font-bold mb-2">Booking Confirmed!</h1>
             <p className="text-muted-foreground">
-              Your booking has been successfully confirmed. You'll receive a confirmation email shortly.
+              Your booking has been successfully confirmed. You&apos;ll receive a confirmation email shortly.
             </p>
           </div>
 

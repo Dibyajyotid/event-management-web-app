@@ -56,8 +56,8 @@ export default function EventDetailsPage() {
 
       const eventData = await response.json();
       setEvent(eventData);
-    } catch (err: any) {
-      setError(err.message || "Failed to load event");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load event");
     } finally {
       setLoading(false);
     }

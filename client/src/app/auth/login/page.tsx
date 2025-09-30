@@ -31,8 +31,8 @@ export default function LoginPage() {
     try {
       await login(email, password)
       router.push("/dashboard")
-    } catch (err: any) {
-      setError(err.message || "Login failed")
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login failed")
     } finally {
       setLoading(false)
     }
@@ -123,7 +123,7 @@ export default function LoginPage() {
 
             <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
-                Don't have an account?{" "}
+                Don&apos;t have an account?{" "}
                 <Link href="/auth/register" className="text-primary hover:underline">
                   Sign up
                 </Link>

@@ -301,7 +301,7 @@ export default function SettingsPage() {
                   <div>
                     <Label className="text-base font-medium">Favorite Categories</Label>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Select categories you're interested in to get personalized recommendations
+                      Select categories you&apos;re interested in to get personalized recommendations
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {categories.map((category) => (
