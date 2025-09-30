@@ -9,13 +9,6 @@ import {
   type ReactNode,
 } from "react";
 
-// interface User {
-//   id: string;
-//   firstName: string;
-//   lastName: string;
-//   email: string;
-//   role: string;
-// }
 
 interface AuthContextType {
   user: User | null;
