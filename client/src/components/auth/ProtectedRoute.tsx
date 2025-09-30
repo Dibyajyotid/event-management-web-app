@@ -1,34 +1,43 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useAuth } from "@/contexts/AuthContext"
-import { useRouter } from "next/navigation"
-import { useEffect } from "react"
-import { Loader2 } from "lucide-react"
+import type React from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { Loader2 } from "lucide-react";
 
 interface ProtectedRouteProps {
-  children: React.ReactNode
-  requiredRole?: string
+  children: React.ReactNode;
+  requiredRole?: string;
 }
 
-export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
-  const { user, loading } = useAuth()
-  const router = useRouter()
+export function ProtectedRoute({
+  children,
+  requiredRole,
+}: ProtectedRouteProps) {
+  const { user, loading, fetchUser } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!user && !loading) {
+      // 🔑 Try fetching user from cookie session
+      fetchUser();
+    }
+  }, [user, loading, fetchUser]);
 
   useEffect(() => {
     if (!loading) {
       if (!user) {
-        router.push("/auth/login")
-        return
+        router.push("/auth/login");
+        return;
       }
 
       if (requiredRole && user.role !== requiredRole) {
-        router.push("/dashboard")
-        return
+        router.push("/dashboard");
+        return;
       }
     }
-  }, [user, loading, router, requiredRole])
+  }, [user, loading, router, requiredRole]);
 
   if (loading) {
     return (
@@ -38,16 +47,16 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
           <p className="text-muted-foreground">Loading...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (!user) {
-    return null
+    return null;
   }
 
   if (requiredRole && user.role !== requiredRole) {
-    return null
+    return null;
   }
 
-  return <>{children}</>
+  return <>{children}</>;
 }

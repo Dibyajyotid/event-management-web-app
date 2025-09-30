@@ -80,6 +80,10 @@ export async function login(req, res) {
         lastName: user.lastName,
         email: user.email,
         role: user.role,
+        avatar: user.avatar,
+        preferances: user.preferences,
+        bookmarkedEvents: user.bookmarkedEvents,
+        isVerified: user.isVerified,
       },
     });
   } catch (error) {

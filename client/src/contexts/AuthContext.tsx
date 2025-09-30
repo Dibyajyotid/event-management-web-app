@@ -1,5 +1,6 @@
 "use client";
 
+import { User } from "@/types/userTypes";
 import {
   createContext,
   useContext,
@@ -8,19 +9,20 @@ import {
   type ReactNode,
 } from "react";
 
-interface User {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  role: string;
-}
+// interface User {
+//   id: string;
+//   firstName: string;
+//   lastName: string;
+//   email: string;
+//   role: string;
+// }
 
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
   register: (userData: RegisterData) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
+  fetchUser: () => Promise<void>;
   loading: boolean;
 }
 
@@ -38,24 +40,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for stored token on mount
-    const token = localStorage.getItem("token");
-    if (token) {
-      // Verify token with backend
-      fetchUser(token);
-    } else {
-      setLoading(false);
-    }
+    // Check logged-in user when app loads
+    fetchUser();
   }, []);
 
-  const fetchUser = async (token: string) => {
+  const fetchUser = async () => {
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          method: "GET",
+          credentials: "include", // ✅ important
         }
       );
 
@@ -63,11 +58,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const userData = await response.json();
         setUser(userData);
       } else {
-        localStorage.removeItem("token");
+        setUser(null);
       }
     } catch (error) {
       console.error("Error fetching user:", error);
-      localStorage.removeItem("token");
+      setUser(null);
     } finally {
       setLoading(false);
     }
@@ -78,9 +73,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
+        credentials: "include", // ✅ cookie comes automatically
         body: JSON.stringify({ email, password }),
       }
     );
@@ -91,7 +85,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error(data.message || "Login failed");
     }
 
-    localStorage.setItem("token", data.token);
     setUser(data.user);
   };
 
@@ -100,9 +93,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       `${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
+        credentials: "include", // ✅ cookie comes automatically
         body: JSON.stringify(userData),
       }
     );
@@ -113,17 +105,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error(data.message || "Registration failed");
     }
 
-    localStorage.setItem("token", data.token);
     setUser(data.user);
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    setUser(null);
+  const logout = async () => {
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`, {
+        method: "POST",
+        credentials: "include", // ✅ remove cookie
+      });
+    } catch (err) {
+      console.error("Logout failed:", err);
+    } finally {
+      setUser(null);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+    <AuthContext.Provider
+      value={{ user, login, register, logout, loading, fetchUser }}
+    >
       {children}
     </AuthContext.Provider>
   );
