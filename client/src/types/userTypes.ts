@@ -8,7 +8,7 @@ export interface UserPreferences {
 }
 
 export interface User {
-  id: string;
+  _id: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -17,4 +17,6 @@ export interface User {
   preferances: UserPreferences;
   bookmarkedEvents: string[]; // assuming these are event IDs
   isVerified: boolean;
+  createdAt: string;
+  updatedAt: string;
 }

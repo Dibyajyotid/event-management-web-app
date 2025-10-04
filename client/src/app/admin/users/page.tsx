@@ -1,40 +1,55 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
-import { AdminLayout } from "@/components/layout/AdminLayout"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Search, Filter, MoreHorizontal, UserCheck, UserX, Shield } from "lucide-react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-
-interface User {
-  _id: string
-  firstName: string
-  lastName: string
-  email: string
-  role: string
-  isVerified: boolean
-  createdAt: string
-  avatar?: string
-}
+import { useState, useEffect } from "react";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { AdminLayout } from "@/components/layout/AdminLayout";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Search,
+  Filter,
+  MoreHorizontal,
+  UserCheck,
+  UserX,
+  Shield,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { User } from "@/types/userTypes";
 
 export default function AdminUsersPage() {
-  const [users, setUsers] = useState<User[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [roleFilter, setRoleFilter] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
-    fetchUsers()
-  }, [currentPage, searchTerm, roleFilter])
+    fetchUsers();
+  }, [currentPage, searchTerm, roleFilter]);
 
   const fetchUsers = async () => {
     try {
@@ -43,63 +58,68 @@ export default function AdminUsersPage() {
         limit: "20",
         search: searchTerm,
         ...(roleFilter && { role: roleFilter }),
-      })
+      });
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users?${queryParams}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      })
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/admin/users?${queryParams}`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
 
       if (response.ok) {
-        const data = await response.json()
-        setUsers(data.users)
-        setTotalPages(data.totalPages)
+        const data = await response.json();
+        setUsers(data.users);
+        setTotalPages(data.totalPages);
       }
     } catch (error) {
-      console.error("Error fetching users:", error)
+      console.error("Error fetching users:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const updateUserRole = async (userId: string, newRole: string) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/${userId}/role`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({ role: newRole }),
-      })
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/${userId}/role`,
+        {
+          method: "PATCH",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ role: newRole }),
+        }
+      );
 
       if (response.ok) {
-        fetchUsers() // Refresh the list
+        fetchUsers(); // Refresh the list
       }
     } catch (error) {
-      console.error("Error updating user role:", error)
+      console.error("Error updating user role:", error);
     }
-  }
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
-    })
-  }
+    });
+  };
 
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
       case "admin":
-        return "destructive"
+        return "destructive";
       case "organizer":
-        return "default"
+        return "default";
       default:
-        return "secondary"
+        return "secondary";
     }
-  }
+  };
 
   return (
     <ProtectedRoute requiredRole="admin">
@@ -107,7 +127,9 @@ export default function AdminUsersPage() {
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold">User Management</h1>
-            <p className="text-muted-foreground">Manage user accounts and permissions</p>
+            <p className="text-muted-foreground">
+              Manage user accounts and permissions
+            </p>
           </div>
 
           {/* Filters */}
@@ -134,7 +156,7 @@ export default function AdminUsersPage() {
                     <SelectValue placeholder="Filter by role" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Roles</SelectItem>
+                    <SelectItem value="all">All Roles</SelectItem>
                     <SelectItem value="user">User</SelectItem>
                     <SelectItem value="organizer">Organizer</SelectItem>
                     <SelectItem value="admin">Admin</SelectItem>
@@ -153,7 +175,10 @@ export default function AdminUsersPage() {
               {loading ? (
                 <div className="space-y-4">
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <div key={i} className="animate-pulse flex items-center space-x-4 p-4">
+                    <div
+                      key={i}
+                      className="animate-pulse flex items-center space-x-4 p-4"
+                    >
                       <div className="w-10 h-10 bg-muted rounded-full" />
                       <div className="flex-1 space-y-2">
                         <div className="h-4 bg-muted rounded w-1/4" />
@@ -180,7 +205,10 @@ export default function AdminUsersPage() {
                         <TableCell>
                           <div className="flex items-center space-x-3">
                             <Avatar className="h-8 w-8">
-                              <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.firstName} />
+                              <AvatarImage
+                                src={user.avatar || "/placeholder.svg"}
+                                alt={user.firstName}
+                              />
                               <AvatarFallback>
                                 {user.firstName[0]}
                                 {user.lastName[0]}
@@ -195,10 +223,14 @@ export default function AdminUsersPage() {
                         </TableCell>
                         <TableCell>{user.email}</TableCell>
                         <TableCell>
-                          <Badge variant={getRoleBadgeVariant(user.role)}>{user.role}</Badge>
+                          <Badge variant={getRoleBadgeVariant(user.role)}>
+                            {user.role}
+                          </Badge>
                         </TableCell>
                         <TableCell>
-                          <Badge variant={user.isVerified ? "default" : "secondary"}>
+                          <Badge
+                            variant={user.isVerified ? "default" : "secondary"}
+                          >
                             {user.isVerified ? "Verified" : "Unverified"}
                           </Badge>
                         </TableCell>
@@ -211,15 +243,25 @@ export default function AdminUsersPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => updateUserRole(user._id, "user")}>
+                              <DropdownMenuItem
+                                onClick={() => updateUserRole(user._id, "user")}
+                              >
                                 <UserCheck className="mr-2 h-4 w-4" />
                                 Make User
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => updateUserRole(user._id, "organizer")}>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  updateUserRole(user._id, "organizer")
+                                }
+                              >
                                 <UserCheck className="mr-2 h-4 w-4" />
                                 Make Organizer
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => updateUserRole(user._id, "admin")}>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  updateUserRole(user._id, "admin")
+                                }
+                              >
                                 <Shield className="mr-2 h-4 w-4" />
                                 Make Admin
                               </DropdownMenuItem>
@@ -246,18 +288,22 @@ export default function AdminUsersPage() {
                   >
                     Previous
                   </Button>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <Button
-                      key={page}
-                      variant={currentPage === page ? "default" : "outline"}
-                      onClick={() => setCurrentPage(page)}
-                    >
-                      {page}
-                    </Button>
-                  ))}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    (page) => (
+                      <Button
+                        key={page}
+                        variant={currentPage === page ? "default" : "outline"}
+                        onClick={() => setCurrentPage(page)}
+                      >
+                        {page}
+                      </Button>
+                    )
+                  )}
                   <Button
                     variant="outline"
-                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                    onClick={() =>
+                      setCurrentPage(Math.min(totalPages, currentPage + 1))
+                    }
                     disabled={currentPage === totalPages}
                   >
                     Next
@@ -269,5 +315,5 @@ export default function AdminUsersPage() {
         </div>
       </AdminLayout>
     </ProtectedRoute>
-  )
+  );
 }

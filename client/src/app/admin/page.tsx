@@ -68,8 +68,10 @@ export default function AdminDashboard() {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/admin/stats?timeRange=${timeRange}`,
         {
+          method: "GET",
+          credentials: "include",
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
           },
         }
       );

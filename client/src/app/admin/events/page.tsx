@@ -1,41 +1,32 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
-import { AdminLayout } from "@/components/layout/AdminLayout"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, Filter, CheckCircle, XCircle, Clock } from "lucide-react"
-
-interface Event {
-  _id: string
-  title: string
-  category: string
-  status: string
-  startDate: string
-  organizer: {
-    firstName: string
-    lastName: string
-    email: string
-  }
-  attendees: string[]
-  capacity: number
-  createdAt: string
-}
+import { useState, useEffect } from "react";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { AdminLayout } from "@/components/layout/AdminLayout";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Search, Filter, CheckCircle, XCircle, Clock } from "lucide-react";
+import { Event } from "@/types/eventTypes";
 
 export default function AdminEventsPage() {
-  const [events, setEvents] = useState<Event[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
-  const [categoryFilter, setCategoryFilter] = useState("all")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
-    fetchEvents()
-  }, [currentPage, searchTerm, statusFilter, categoryFilter])
+    fetchEvents();
+  }, [currentPage, searchTerm, statusFilter, categoryFilter]);
 
   const fetchEvents = async () => {
     try {
@@ -45,80 +36,85 @@ export default function AdminEventsPage() {
         search: searchTerm,
         ...(statusFilter !== "all" && { status: statusFilter }),
         ...(categoryFilter !== "all" && { category: categoryFilter }),
-      })
+      });
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/events?${queryParams}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      })
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/admin/events?${queryParams}`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
 
       if (response.ok) {
-        const data = await response.json()
-        setEvents(data.events)
-        setTotalPages(data.totalPages)
+        const data = await response.json();
+        setEvents(data.events);
+        setTotalPages(data.totalPages);
       }
     } catch (error) {
-      console.error("Error fetching events:", error)
+      console.error("Error fetching events:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const updateEventStatus = async (eventId: string, newStatus: string) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/events/${eventId}/status`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({ status: newStatus }),
-      })
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/admin/events/${eventId}/status`,
+        {
+          method: "PATCH",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status: newStatus }),
+        }
+      );
 
       if (response.ok) {
-        fetchEvents() // Refresh the list
+        fetchEvents(); // Refresh the list
       }
     } catch (error) {
-      console.error("Error updating event status:", error)
+      console.error("Error updating event status:", error);
     }
-  }
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
-    })
-  }
+    });
+  };
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case "published":
-        return "default"
+        return "default";
       case "draft":
-        return "secondary"
+        return "secondary";
       case "cancelled":
-        return "destructive"
+        return "destructive";
       case "completed":
-        return "outline"
+        return "outline";
       default:
-        return "secondary"
+        return "secondary";
     }
-  }
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "published":
-        return <CheckCircle className="h-4 w-4" />
+        return <CheckCircle className="h-4 w-4" />;
       case "cancelled":
-        return <XCircle className="h-4 w-4" />
+        return <XCircle className="h-4 w-4" />;
       case "draft":
-        return <Clock className="h-4 w-4" />
+        return <Clock className="h-4 w-4" />;
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   return (
     <ProtectedRoute requiredRole="admin">
@@ -160,7 +156,10 @@ export default function AdminEventsPage() {
                     <SelectItem value="completed">Completed</SelectItem>
                   </SelectContent>
                 </Select>
-                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <Select
+                  value={categoryFilter}
+                  onValueChange={setCategoryFilter}
+                >
                   <SelectTrigger className="w-40">
                     <SelectValue placeholder="Filter by category" />
                   </SelectTrigger>
@@ -188,7 +187,10 @@ export default function AdminEventsPage() {
               {loading ? (
                 <div className="space-y-4">
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <div key={i} className="animate-pulse flex items-center space-x-4 p-4">
+                    <div
+                      key={i}
+                      className="animate-pulse flex items-center space-x-4 p-4"
+                    >
                       <div className="flex-1 space-y-2">
                         <div className="h-4 bg-muted rounded w-3/4"></div>
                         <div className="h-3 bg-muted rounded w-1/2"></div>
@@ -203,7 +205,10 @@ export default function AdminEventsPage() {
               ) : (
                 <div className="space-y-4">
                   {events.map((event) => (
-                    <div key={event._id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                    <div
+                      key={event._id}
+                      className="border rounded-lg p-4 hover:bg-muted/50 transition-colors"
+                    >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
@@ -213,10 +218,10 @@ export default function AdminEventsPage() {
                                 event.status === "published"
                                   ? "bg-green-100 text-green-800"
                                   : event.status === "draft"
-                                    ? "bg-yellow-100 text-yellow-800"
-                                    : event.status === "cancelled"
-                                      ? "bg-red-100 text-red-800"
-                                      : "bg-gray-100 text-gray-800"
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : event.status === "cancelled"
+                                  ? "bg-red-100 text-red-800"
+                                  : "bg-gray-100 text-gray-800"
                               }`}
                             >
                               {getStatusIcon(event.status)}
@@ -226,12 +231,14 @@ export default function AdminEventsPage() {
                           <div className="text-sm text-muted-foreground space-y-1">
                             <p>Category: {event.category}</p>
                             <p>
-                              Organizer: {event.organizer.firstName} {event.organizer.lastName} ({event.organizer.email}
-                              )
+                              Organizer: {event.organizer.firstName}{" "}
+                              {event.organizer.lastName} (
+                              {event.organizer.email})
                             </p>
                             <p>Date: {formatDate(event.startDate)}</p>
                             <p>
-                              Attendees: {event.attendees.length} / {event.capacity}
+                              Attendees: {event.attendees.length} /{" "}
+                              {event.capacity}
                             </p>
                             <p>Created: {formatDate(event.createdAt)}</p>
                           </div>
@@ -239,16 +246,24 @@ export default function AdminEventsPage() {
                         <div className="flex items-center gap-2">
                           <Select
                             value={event.status}
-                            onValueChange={(newStatus) => updateEventStatus(event._id, newStatus)}
+                            onValueChange={(newStatus) =>
+                              updateEventStatus(event._id, newStatus)
+                            }
                           >
                             <SelectTrigger className="w-32">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="draft">Draft</SelectItem>
-                              <SelectItem value="published">Published</SelectItem>
-                              <SelectItem value="cancelled">Cancelled</SelectItem>
-                              <SelectItem value="completed">Completed</SelectItem>
+                              <SelectItem value="published">
+                                Published
+                              </SelectItem>
+                              <SelectItem value="cancelled">
+                                Cancelled
+                              </SelectItem>
+                              <SelectItem value="completed">
+                                Completed
+                              </SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -266,14 +281,18 @@ export default function AdminEventsPage() {
                   </p>
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
                       disabled={currentPage === 1}
                       className="px-3 py-1 text-sm border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted"
                     >
                       Previous
                     </button>
                     <button
-                      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                      }
                       disabled={currentPage === totalPages}
                       className="px-3 py-1 text-sm border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted"
                     >
@@ -287,5 +306,5 @@ export default function AdminEventsPage() {
         </div>
       </AdminLayout>
     </ProtectedRoute>
-  )
+  );
 }

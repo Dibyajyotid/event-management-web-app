@@ -5,6 +5,7 @@ import {
   getAdminDashboardStats,
   getAllBookings,
   getAllEvents,
+  getAllUsers,
   updateEventStatus,
   updateUserRole,
 } from "../controllers/admin.controller.js";
@@ -15,7 +16,7 @@ const router = express.Router();
 router.get("/stats", authenticateToken, adminAuth, getAdminDashboardStats);
 
 // Get all users with pagination
-router.get("/users", authenticateToken, adminAuth);
+router.get("/users", authenticateToken, adminAuth, getAllUsers);
 
 // Update user role
 router.patch("/users/:id/role", authenticateToken, adminAuth, updateUserRole);
