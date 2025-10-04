@@ -11,40 +11,135 @@ import {
 import { Button } from "@/components/ui/button";
 import { Calendar, Ticket, Heart, TrendingUp } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { StatsResponse } from "@/types/analyticsTypes";
+
+interface StatCard {
+  title: string;
+  value: number | string;
+  description: string;
+  icon: React.ElementType;
+  href: string;
+}
+
+interface RecentActivity {
+  id: string;
+  type: "booked" | "saved" | "attended";
+  eventName: string;
+  timeAgo: string;
+}
+
+// interface ApiStatsResponse {
+//   overview: {
+//     totalUsers: number;
+//     totalEvents: number;
+//     totalBookings: number;
+//     totalRevenue: number;
+//     newUsers: number;
+//     newEvents: number;
+//     newBookings: number;
+//     revenueInRange: number;
+//   };
+//   charts: {
+//     dailyStats: any[];
+//     categoryStats: Array<{ _id: string; count: number }>;
+//     topEvents: Array<{ _id: string; name: string; date: string }>;
+//   };
+// }
 
 export function DashboardOverview() {
   const { user } = useAuth();
+  const [stats, setStats] = useState<StatCard[]>([]);
+  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>(
+    []
+  );
+  const [loading, setLoading] = useState(true);
 
-  const stats = [
-    {
-      title: "Upcoming Events",
-      value: "3",
-      description: "Events you're attending",
-      icon: Calendar,
-      href: "/dashboard/events",
-    },
-    {
-      title: "Total Bookings",
-      value: "12",
-      description: "All-time bookings",
-      icon: Ticket,
-      href: "/dashboard/bookings",
-    },
-    {
-      title: "Saved Events",
-      value: "8",
-      description: "Events in your wishlist",
-      icon: Heart,
-      href: "/dashboard/favorites",
-    },
-    {
-      title: "Events Attended",
-      value: "25",
-      description: "Completed events",
-      icon: TrendingUp,
-      href: "/dashboard/analytics",
-    },
-  ];
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/admin/stats`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
+
+      if (!res.ok) throw new Error("Failed to fetch stats");
+
+      const data: StatsResponse = await res.json();
+
+      // Map API data to stat cards
+      const mappedStats: StatCard[] = [
+        {
+          title: "Upcoming Events",
+          value: data.charts.topEvents.length,
+          description: "Events you're attending",
+          icon: Calendar,
+          href: "/dashboard/events",
+        },
+        {
+          title: "Total Bookings",
+          value: data.overview.totalBookings,
+          description: "All-time bookings",
+          icon: Ticket,
+          href: "/dashboard/bookings",
+        },
+        {
+          title: "Saved Events",
+          value: 0, // Could fetch user's wishlist if available
+          description: "Events in your wishlist",
+          icon: Heart,
+          href: "/dashboard/favorites",
+        },
+        {
+          title: "Events Attended",
+          value: 0, // Could calculate from completed events if available
+          description: "Completed events",
+          icon: TrendingUp,
+          href: "/dashboard/analytics",
+        },
+      ];
+
+      // Map recent activities from topEvents
+      const mappedActivities: RecentActivity[] = data.charts.topEvents
+        .slice(0, 5)
+        .map((event, idx) => ({
+          id: event._id || idx.toString(),
+          type: "booked",
+          eventName: event.name,
+          timeAgo: "Recently", // You can enhance this with actual timestamps
+        }));
+
+      setStats(mappedStats);
+      setRecentActivities(mappedActivities);
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getActivityColor = (type: RecentActivity["type"]) => {
+    switch (type) {
+      case "booked":
+        return "bg-primary";
+      case "saved":
+        return "bg-chart-2";
+      case "attended":
+        return "bg-chart-3";
+      default:
+        return "bg-muted";
+    }
+  };
+
+  if (loading) {
+    return <p>Loading dashboard...</p>;
+  }
 
   return (
     <div className="space-y-6">
@@ -81,7 +176,7 @@ export function DashboardOverview() {
         ))}
       </div>
 
-      {/* Quick Actions */}
+      {/* Quick Actions & Recent Activity */}
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>
@@ -126,31 +221,34 @@ export function DashboardOverview() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex items-center space-x-4">
-                <div className="w-2 h-2 bg-primary rounded-full" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium">
-                    Booked: Tech Conference 2024
-                  </p>
-                  <p className="text-xs text-muted-foreground">2 hours ago</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-4">
-                <div className="w-2 h-2 bg-chart-2 rounded-full" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Saved: Design Workshop</p>
-                  <p className="text-xs text-muted-foreground">1 day ago</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-4">
-                <div className="w-2 h-2 bg-chart-3 rounded-full" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium">
-                    Attended: Networking Event
-                  </p>
-                  <p className="text-xs text-muted-foreground">3 days ago</p>
-                </div>
-              </div>
+              {recentActivities.length ? (
+                recentActivities.map((activity) => (
+                  <div
+                    key={activity.id}
+                    className="flex items-center space-x-4"
+                  >
+                    <div
+                      className={`w-2 h-2 rounded-full ${getActivityColor(
+                        activity.type
+                      )}`}
+                    />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">
+                        {activity.type.charAt(0).toUpperCase() +
+                          activity.type.slice(1)}
+                        : {activity.eventName}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {activity.timeAgo}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  No recent activity
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>
