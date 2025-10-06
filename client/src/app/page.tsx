@@ -17,11 +17,11 @@ export default function HomePage() {
       <main>
         <Hero />
         {/* <Stats /> */}
-        <section className="py-16 bg-muted/30">
+        {/* <section className="py-16 bg-muted/30">
           <div className="container mx-auto px-4">
             <EventRecommendations />
           </div>
-        </section>
+        </section> */}
 
         <section className="relative py-20 bg-gradient-to-br from-gray-900 via-gray-800 to-black overflow-hidden">
           {/* Futuristic Background Elements */}

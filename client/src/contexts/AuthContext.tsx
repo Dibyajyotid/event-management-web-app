@@ -9,7 +9,6 @@ import {
   type ReactNode,
 } from "react";
 
-
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;

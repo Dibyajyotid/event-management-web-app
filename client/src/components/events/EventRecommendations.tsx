@@ -155,7 +155,21 @@ export function EventRecommendations() {
   }
 
   if (!recommendations || recommendations.recommendations.length === 0) {
-    return null;
+    return (
+      <Card className="bg-gray-900/80 backdrop-blur-2xl border border-cyan-500/20 shadow-2xl relative overflow-hidden">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-center text-gray-300">
+            No Recommendations Available
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-center text-gray-400">
+            We couldn't find any event recommendations for you at the moment.
+            Please check back later or update your preferences.
+          </p>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
