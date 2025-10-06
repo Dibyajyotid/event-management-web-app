@@ -95,7 +95,7 @@ export async function login(req, res) {
 //logout controller
 export const logout = async (req, res) => {
   try {
-    res.clearCookie("token", {
+    res.clearCookie("jwt", {
       httpOnly: true,
       secure: true,
       sameSite: "None",
