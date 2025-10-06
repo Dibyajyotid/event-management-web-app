@@ -35,7 +35,7 @@ router.post(
 );
 
 //logout
-router.post("logout", logout);
+router.post("/logout", logout);
 
 // Get current user
 router.get("/me", authenticateToken, getMe);
