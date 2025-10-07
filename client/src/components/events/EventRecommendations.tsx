@@ -164,7 +164,7 @@ export function EventRecommendations() {
         </CardHeader>
         <CardContent>
           <p className="text-center text-gray-400">
-            We couldn't find any event recommendations for you at the moment.
+            We couldn&apos;t find any event recommendations for you at the moment.
             Please check back later or update your preferences.
           </p>
         </CardContent>
